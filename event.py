@@ -1,5 +1,6 @@
-from datetime import date
 import sqlite3
+import sys
+import os
 
 
 class Event:
@@ -24,29 +25,46 @@ class Event:
         self.description = description
         self.location = location
 
-    def creat_event(
-        self,
-        begin_date,
-        end_date,
-        begin_time,
-        end_time,
-        title,
-        description,
-        location,
-    ):
-        con = sqlite3.connect(os.path.join(sys.path[0], "calender.db"))
+    def create_event(self):
+        con = sqlite3.connect(os.path.join(sys.path[0], "calendar.db"))
         cursor = con.cursor()
 
         cursor.execute(
             """
             INSERT INTO events(title, description, location, begin_date, end_date, begin_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (self.title, self.description, self.location, self.begin_date, self.end_date, self.begin_time, self.end_time),
+            (
+                self.title,
+                self.description,
+                self.location,
+                self.begin_date,
+                self.end_date,
+                self.begin_time,
+                self.end_time,
+            ),
         )
         con.commit()
+        con.close()
+        print("---Event succesfully added to the calendar database!---")
 
-    def delete_event():
-        pass
+    def delete_event(self):
+        con = sqlite3.connect(os.path.join(sys.path[0], "calendar.db"))
+        cursor = con.cursor()
+
+        cursor.execute(
+            """
+            DELETE FROM events WHERE id = ? AND title = ?  -- Fixed SQL syntax
+            """,
+            (self.id, self.title),
+        )
+
+        if cursor.rowcount > 0:
+            con.commit()
+            print("---Event successfully deleted from the calendar database!---")
+        else:
+            print("---No event found with that ID and title!---")
+
+        con.close()
 
     def repeat_event():
         pass
